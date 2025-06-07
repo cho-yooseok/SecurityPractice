@@ -1,0 +1,58 @@
+package com.example.security.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+public class Role { // 권한
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true)
+    private String name; // USER, MANAGER, ADMIN
+}
+
+
+
+/*
+코드 해설
+
+Role 클래스는 Spring Security 와 같은 인증/ 인가 시스템에서 사용자의 권한을 정의하는 데 사용되는
+JPA(Java Persistence API) 엔티티 입니다. 이 클래스는 데이터베이스 테이블과 직접 매핑되어 권한 데이터를
+저장하고 관리합니다
+
+@Entity
+이 어노테이션은 Role 클래스가 JPA 엔티티임을 선언합니다.
+즉, 이 클래스의 인스턴스가 데이터베이스의 한 레코드(행)에 해당하며, 이 클래스는 데이터베이스 테이블과 매핑됩니다.
+특별히 테이블 이름을 지정하지 않으면, 클래스 이름인 Role이 테이블 이름으로 사용됩니다
+
+Lombok 어노테이션
+@Setter
+컴파일 시 모든 필드(id, name) 에 대한 public set 메소드를 자동으로 생성해 줍니다
+@Getter
+컴파일 시 모든 필드(id, name) 에 대한 public get 메소드를 자동으로 생성해 줍니다
+@NoArgsConstructor
+인자(argument)가 없는 기본 생성자를 자동으로 생성합니다
+JPA엔티티는 프록시 생성을 위해 기본 생성자가 반드시 필요합니다
+@AllArgsConstructor
+클래스의 모든 필드를 인자로 받는 생성자를 자동으로 생성합니다.
+객체 생성 시 모든 필드 값을 한 번에 설정 할 때 유용합니다
+
+private String name;
+@Column(unique = true)
+이 필드가 데이터베이스 테이블의 컬럼임을 나타냅니다
+unique = true 속성은 name 컬럼의 값이 유일해야 함을 의미합니다
+즉 동일한 이름의 권한은 두 개 이상 존재할 수 없습니다
+(예 "USER" 권한은 하나만 존재)
+
+// USER, MANAGER, ADMIN
+
+ */

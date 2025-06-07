@@ -1,0 +1,43 @@
+package com.example.security.service;
+// 이 클래스가 속한 패키지를 선언합니다
+
+import com.example.security.entity.Role;
+// Role 엔티티(개체) 클래스를 가져옵니다
+import com.example.security.repository.RoleRepository;
+// 데이터베이스 작업을 위한 RoleRepository를 가져옵니다
+import lombok.RequiredArgsConstructor;
+// 필요한 인자를 받는 생성자를 자동으로 만들어주는 Lombok어노테이션입니다
+import org.springframework.stereotype.Service;
+// 이 클래스를 서비스 컴포넌트로 지정하는 Spring 어노테이션입니다
+
+@Service
+// 이 어노테이션은 이 클래스가
+// Spring프레임워크에서 "서비스"컴포넌트임을 나타냅니다
+// Spring은 애플리케이션 컨텍스트를 스캔할 때
+// 이 클래스를 자동으로 감지하고 빈(Bean)으로 등록합니다
+@RequiredArgsConstructor
+// 이 Lombok 어노테이션은
+// 'final' 필드를 인자로 받는  생성자를 자동으로 생성합니다
+// 이는 의존성 주입(예: roleRepository)을 편리하게 수행하는 방법입니다
+public class RoleService{
+
+    private final RoleRepository roleRepository;
+    // Role 엔티티에 대한 데이터베이스 상호작용을 위해 RoleRepository를 주입합니다
+
+    /*
+    역할(Role)의 이름으로 해당 역할을 찾습니다
+    Finds a Role by its name
+
+    @param name  찾고자하는 역할의 이름입니다 (예: "USER", "ADMIN")
+    The name of the Role to search of (e.g., "USER", "ADMIN")
+    @return 주어진 이름에 해당하는 Role 객체를 반환합니다
+    Returns the Role object corresponding to the given name
+     */
+    public Role findByName(String name){
+        // roleRepository를 사용하여 데이터베이스에서
+        // 주어진 이름과 일치하는 Role을 찾아 반환합니다
+        // this method uses roleRepository to find and return a Role
+        // from the database that matches the given name
+        return roleRepository.findByName(name);
+    }
+}

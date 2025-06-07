@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!-- HTML5 문서 선언, 언어는 영어로 설정. Thymeleaf 네임스페이스를 정의하여 Thymeleaf 속성 사용 가능 -->
+<head>
+    <title>Bootstrap Example</title>
+    <!-- 페이지 제목: 부트스트랩 예제 -->
+    <meta charset="utf-8">
+    <!-- 문자 인코딩: UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 반응형 웹 설정: 화면 크기에 맞게 조정, 초기 줌 레벨 1 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <!-- 부트스트랩 4.6.2 CSS 파일 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
+    <!-- jQuery Slim 3.7.1 로드 (부트스트랩 동작에 필요) -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <!-- Popper.js 1.16.1 로드 (부트스트랩의 드롭다운, 툴팁 등에 필요) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 부트스트랩 4.6.2 JavaScript 파일 로드 (jQuery와 Popper.js 포함) -->
+</head>
+<body>
+<div class="container mt-4">
+    <!-- 부트스트랩 컨테이너 클래스로 콘텐츠를 중앙 정렬, mt-4는 상단 마진 -->
+    <h2> 회원인증 시스템</h2>
+    <!-- 페이지 제목: 회원인증 시스템 -->
+    <div class="card">
+        <!-- 부트스트랩 카드 컴포넌트로 콘텐츠를 그룹화 -->
+        <div class="card-header">
+            회원가입
+            <!-- 카드 헤더: 회원가입 타이틀 -->
+        </div>
+        <div class="card-body">
+            <!-- 카드 본문: 회원가입 폼 포함 -->
+            <!-- 회원가입 폼: Thymeleaf로 /register 경로에 POST 요청 -->
+            <form th:action="@{/register}" method="post">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <!-- 사용자 이름 입력 필드 라벨 -->
+                    <input type="text" class="form-control" placeholder="Enter username" id="username" name="username">
+                    <!-- 사용자 이름 입력 필드, name="username"은 서버로 전송되는 데이터의 키 -->
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <!-- 비밀번호 입력 필드 라벨 -->
+                    <input type="password" class="form-control" placeholder="Enter password" id="password" name="password">
+                    <!-- 비밀번호 입력 필드, name="password"는 서버로 전송되는 데이터의 키 -->
+                </div>
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <!-- 이름 입력 필드 라벨 -->
+                    <input type="text" class="form-control" placeholder="Enter name" id="name" name="name">
+                    <!-- 이름 입력 필드, name="name"은 서버로 전송되는 데이터의 키 -->
+                </div>
+                <div class="form-group">
+                    <label for="age">Age:</label>
+                    <!-- 나이 입력 필드 라벨 -->
+                    <input type="number" class="form-control" placeholder="Enter age" id="age" name="age">
+                    <!-- 나이 입력 필드, 숫자만 입력 가능, name="age"는 서버로 전송되는 데이터의 키 -->
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <!-- 이메일 입력 필드 라벨 -->
+                    <input type="type" class="form-control" placeholder="Enter email" id="email" name="email">
+                    <!-- 이메일 입력 필드, type="type"은 type="email"로 수정 필요, name="email"은 서버로 전송되는 데이터의 키 -->
+                </div>
+                <button type="submit" class="btn btn-primary">회원가입</button>
+                <!-- 회원가입 버튼, 폼 제출 트리거 -->
+                <a th:href="@{/ui/list}" class="btn btn-primary">메인화면</a>
+                <!-- 메인화면 링크, Thymeleaf로 /ui/list 경로 연결 -->
+            </form>
+        </div>
+        <div class="card-footer">스프링 부트(Spring Security)</div>
+        <!-- 카드 푸터: 스프링 부트와 Spring Security 사용 명시 -->
+    </div>
+</div>
+</body>
+</html>
+
+<!--
+주요 요소 해석
+xmlns:th 를 통해 Thymeleaf 네임스페이스를 선언하여 th:action과 th:href 속성을 사용
+th:action="@{/register}"는 회원가입 폼 데이터를 /register 엔드포인트로 POST요청으로 전송
+th:href="@{/ui/list}" 는 메인화면으로 이동하는 링크를 동적으로 생성
+
+부트스트랩 사용
+Bootstrap 4.6.2 CSS와 JS를 CDN으로 로드하여 반응형 스타일과 동적 기능을 제공
+container, card, form-group, btn 등의 클래스를 사용하여 깔끔한UI구성
+form-control 클래스로 입력 필드 스타일링, btn-primary로 버튼 스타일링
+
+회원가입폼
+폼은 사용자이름(username), 비밀번호(password), 이름(name), 나이(age), 이메일(email) 입력 필드를 포함
+각 입력 필드는 name 속성을 통해 서버로 데이터 전송
+
+버튼과 링크
+회원가입 버튼은 폼을 제출하여 서버로 데이터 전송
+메인화면 버튼은
+/ui/list/ 경로로 이동
+
+http://localhost:8080/ui/list
+
+
+
+
+이 템플릿은 회원가입 기능을 제공하는 간단한 폼 페이지로,
+Spring Boot와 Thymeleaf를 사용하여 동적 경로를 설정하고 Bootstrap으로 UI를 구성.
+서버 측에서는 /register 엔드포인트가 폼 데이터를 처리하고,
+/ui/list 경로가 메인화면으로 리디렉션될 것으로 예상.
+
+입력 필드의 name 속성은 백엔드에서 데이터를 매핑하는 데 사용되므로,
+컨트롤러에서 동일한 이름으로 데이터를 받도록 설정해야함
+
+
+-->

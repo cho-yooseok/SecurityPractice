@@ -1,0 +1,108 @@
+package com.example.security.service;
+// 이 클래스가 속한 패키지를 선언합니다.
+
+import com.example.security.entity.Member;
+// Member 엔티티(개체) 클래스를 가져옵니다.
+import com.example.security.entity.Role;
+// Role 엔티티(개체) 클래스를 가져옵니다.
+import com.example.security.repository.MemberRepository;
+// 데이터베이스 작업을 위한 MemberRepository를 가져옵니다.
+import lombok.RequiredArgsConstructor;
+// 필요한 인자를 받는 생성자를 자동으로 만들어주는 Lombok 어노테이션입니다.
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+// Spring Security에서 사용자를 찾지 못했을 때 발생하는 예외입니다.
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+// 비밀번호 암호화를 위한 Spring Security 클래스입니다.
+import org.springframework.stereotype.Service;
+// 이 클래스를 서비스 컴포넌트로 지정하는 Spring 어노테이션입니다.
+
+import java.util.HashSet;
+// 고유한 요소들의 집합(컬렉션)을 만들기 위한 유틸리티 클래스입니다.
+import java.util.Optional;
+// 값이 존재할 수도 있고 존재하지 않을 수도 있는 상황을 처리하기 위한 유틸리티 클래스입니다.
+import java.util.Set;
+// 중복된 요소를 포함하지 않는 컬렉션을 위한 인터페이스입니다.
+
+@Service
+// 이 어노테이션은 이 클래스가 Spring 프레임워크에서 "서비스" 컴포넌트임을 나타냅니다.
+// Spring은 이 클래스를 자동으로 감지하고 서비스로 등록합니다.
+@RequiredArgsConstructor
+// 이 Lombok 어노테이션은 'final' 필드를 인자로 받는 생성자를 자동으로 생성합니다.
+// 이는 의존성 주입(예: memberRepository, passwordEncoder, roleService)을 편리하게 수행하는 방법입니다.
+public class MemberService {
+
+    private final MemberRepository memberRepository;
+    // Member 엔티티에 대한 데이터베이스 상호작용을 위해 MemberRepository를 주입합니다.
+    private final BCryptPasswordEncoder passwordEncoder;
+    // 사용자 비밀번호를 암호화하기 위해 BCryptPasswordEncoder를 주입합니다.
+    private final RoleService roleService;
+    // 역할(Role) 관리를 위해 RoleService를 주입합니다(예: 이름으로 역할 찾기).
+
+    /**
+     * 새로운 회원을 등록합니다.
+     * @param member 등록할 회원 객체입니다.
+     * The member object to register.
+     * @return 암호화된 비밀번호와 할당된 역할을 가진 등록된 회원 객체를 반환합니다.
+     * The registered member with an encrypted password and assigned roles.
+     */
+    public Member register(Member member) {
+        // 1. 사용자가 입력한 패스워드를 암호화합니다.
+        String pwd = passwordEncoder.encode(member.getPassword());
+        // 암호화된 비밀번호를 회원 객체에 다시 설정합니다.
+        member.setPassword(pwd);
+
+        // 2. 회원의 기본 권한(역할)을 저장합니다 (예: USER, MANAGER, ADMIN)
+        // 여기서는 일반적으로 신규 가입자를 위한 'USER'역할을 부여합니다
+        Role userRole = roleService.findByName("USER");
+        // RoleService에서 'USER' 역할을 가져옵니다
+        Set<Role> roles = new HashSet<>();
+        // 역할을 저장할 새로운 HashSet을 생성합니다
+        roles.add(userRole);
+        // 'USER' 역할을 집합에 추가합니다
+        member.setRoles(roles);
+        // 회원 객체에 할당된 역할을 설정합니다
+
+        return memberRepository.save(member);
+        // 암호화된 비밀번호와 역할이 설정된 회원을 데이터베이스에 저장합니다
+    }
+
+    /*
+    사용자 이름으로 회원을 찾습니다
+    @param username 검색할 사용자 이름입니다
+    @return 찾은 회원 객체를 반환합니다
+    @throws UsernameNotFoundException
+    주어진 사용자 이름으로 사용자를 찾을 수 없는 경우 이 예외를 발생시킵니다
+     */
+    public Member findByUsername(String username) {
+        // 사용자 이름으로 회원을 찾을려고 시도합니다 결과는 Opional로 래핑되어있습니다
+        // Optional은 회원을 찾지 못할 수 있는 경우를 안전하게 처리하는 데 도움을 줍니다
+        Optional<Member> optional = memberRepository.findByUsername(username);
+
+        // 회원이 발견되었는지 확인합니다
+        if(!optional.isPresent()){
+            // 회원을 찾을 수 없는 경우, 표준 Spring Security 예외인 UsernameNotFoundException을 발생시킵니다
+            throw new UsernameNotFoundException("User Not found with username: " + username);
+        }
+        // 회원이 발견되면, Optional에서 Member 객체를 가져와 반환합니다
+        return optional.get();
+    }
+}
+
+
+/*
+코드 해설
+의존성 주입 (private final)
+MemberRepository memberRepository
+회원의 데이터베이스 CRUD(생성, 읽기, 업데이터, 삭제) 작업을 수행하는 역할을 합니다
+이 서비스를 통해 데이터베이스와 상호작용합니다
+
+BCryptPasswordEncoder passwordEncoder
+Spring Security에서 제공하는 강력한 비밀번호 암호화 도구입니다
+사용자의 비밀번호를 데이터베이스에 저장하기 전에
+안전하게 암호화(해싱) 하는 데 사용됩니다
+
+RoleService roleService
+애플리케이션 내의 역할(Role) 관련 로직을 담당하는 서비스입니다
+예를 들어, 역할 이름으로 해당 역할을 찾아오는 등의 기능을 수행합니다
+
+ */

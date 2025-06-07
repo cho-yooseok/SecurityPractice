@@ -1,0 +1,103 @@
+package com.example.security.service;
+// 이 클래스가 속한 패키지를 선언합니다.
+
+import com.example.security.entity.CustomerMember;
+// 사용자 정의 UserDetails 구현체인 CustomerMember 클래스를 가져옵니다.
+import com.example.security.entity.Member;
+// Member 엔티티(개체) 클래스를 가져옵니다.
+import lombok.RequiredArgsConstructor;
+// 필요한 인자를 받는 생성자를 자동으로 만들어주는 Lombok 어노테이션입니다.
+import org.springframework.security.core.userdetails.UserDetails;
+// Spring Security에서 사용자 정보를 나타내는 핵심 인터페이스입니다.
+import org.springframework.security.core.userdetails.UserDetailsService;
+// 사용자 이름으로 사용자 정보를 로드하는 핵심 인터페이스입니다.
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+// 사용자를 찾지 못했을 때 발생하는 Spring Security 예외입니다.
+import org.springframework.stereotype.Service;
+// 이 클래스를 서비스 컴포넌트로 지정하는 Spring 어노테이션입니다.
+
+@Service
+// 이 어노테이션은 이 클래스가 Spring 프레임워크에서 "서비스" 컴포넌트임을 나타냅니다.
+// Spring은 애플리케이션 컨텍스트를 스캔할 때 이 클래스를 자동으로 감지하고 빈(Bean)으로 등록합니다.
+@RequiredArgsConstructor
+// 이 Lombok 어노테이션은 'final' 필드(여기서는 memberService)를 인자로 받는 생성자를 자동으로 생성합니다.
+// 이는 의존성 주입을 편리하게 수행하는 방법입니다.
+public class CustomUserDetailsService implements UserDetailsService {
+    // UserDetailsService 인터페이스를 구현하여 Spring Security가 사용자 정보를 로드하는 방법을 정의합니다.
+
+    private final MemberService memberService;
+    // 회원 관련 비즈니스 로직을 처리하는 MemberService를 주입합니다.
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // 1. MemberService를 사용하여 데이터베이스에서 해당 사용자 이름의 Member 정보를 가져옵니다.
+        //    만약 사용자를 찾지 못하면 MemberService 내부에서 UsernameNotFoundException이 발생합니다.
+        Member member = memberService.findByUsername(username);
+        // return member; // CustomerMember
+        System.out.println("CustomUserDetailsService:" + member.getUsername());
+        // 2. 현재 로드된 사용자의 사용자 이름을 콘솔에 출력하여 디버깅을 돕습니다.
+        return new CustomerMember(member);
+        // 3. Spring Security의 인증(Authentication) 시스템이 이해할 수 있는 UserDetails 타입으로 변환하여 반환합니다.
+        //    CustomerMember는 Member 엔티티를 Spring Security의 UserDetails 인터페이스에 맞게 래핑한 클래스입니다.
+        //    이 CustomerMember 객체는 인증 성공 후 Spring Security 컨텍스트에 저장되어
+        //    애플리케이션 전체에서 사용자 정보 및 권한을 조회하는 데 사용됩니다. (Authentication -> View)
+    }
+}
+
+/*
+이 CustomUserDetailsService 클래스는 Spring Security 에서 사용자 인증(로그인) 과정의 핵심 부분입니다
+ UserDetailsService 인터페이스를 구현하여, SpringSecurity가 로그인 시 사용자가 입력한 아이디(사용자 이름)로
+ 데이터베이스에서 사용자 정보를 어떻게 가져올지 정의합니다
+
+
+
+
+클래스와 생성자의 차이
+예시
+Car 클래스
+자동차의 설계도(클래스)  를 정의하고, 이 설계도를 바탕으로 실제 자동차(객체)를 만들고 사용하는 방법
+
+public class Car {
+    // 자동차의 '속성'들 (어떤 특징을 가지고 있는지)
+    String color; // 자동차의 색상
+    int maxSpeed; // 자동차가 낼 수 있는 최대 속도
+
+    // 이 부분이 '생성자'
+    // 새로운 'Car' 객체를 만들 때 항상 호출돼서 초기 설정을 해줍니다
+    // 'initialColor'와 'initialMaxSpeed' 라는 '인자'를 받아서 자동차의 초기 상태를 결정합니다
+    public Car(String initialColor, int initialMaxSpeed) {
+        this.color = initialColor;  // 전달받은 색상으로 이 자동차의 색상을 설정
+        this.maxSpeed = initialMaxSpeed;    // 전달받은 속도로 이 자동차의 최대 속도를 설정
+        System.out.println(initialColor + "car has been produced");
+    }
+
+    // 자동차의 '기능' 들 (어떤 동작을 할 수 있는지)
+    void drive() {
+        System.out.println(color + "car drives at" + maxSpeed + "km/h.");
+    }
+
+    // 프로그램이 시작되는 메인 메서드
+    public static void main(String[] args) {
+        // 첫 번째 자동차 객체 생성
+        // 'new Car("Red", 200)' 은 생성자를 호출해서 '빨간색'이고 '최대속도 200' 인 새 자동차를 만든다
+        Car myCar = new Car("Red", 200);
+
+        // myCar의 'drive()' 기능을 실행
+        myCar.drvie();
+    }
+}
+
+출력 결과
+Red car has been produced!
+Red car drives at 200km/h.
+
+-> 클래스(Class)는 객체(Object)를 찍어내는 틀이고,
+생성자(Constructor)는 그 틀로 객체를 만들 때 초기 설정을 해주는 역할 을 합니다
+
+
+
+
+
+
+
+}
+ */

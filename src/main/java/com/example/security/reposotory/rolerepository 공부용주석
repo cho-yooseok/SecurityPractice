@@ -1,0 +1,57 @@
+package com.example.security.repository;
+// 해당 인터페이스가 속한 패키지 선언
+
+import com.example.security.entity.Role;
+// Role 엔티티 클래스를 가져옴 (사용할 엔티티)
+import org.springframework.data.jpa.repository.JpaRepository;
+// Spring Data JPA에서 제공하는 JpaRepository 인터페이스를 가져옴
+import org.springframework.stereotype.Repository;
+// 해당 인터페이스가 리포지토리임을 나타내는 어노테이션
+
+/**
+ * Role 엔티티와 상호작용하는 데이터 접근 계층(Repository) 인터페이스.
+ * Spring Data JPA의 JpaRepository를 상속받아 기본적인 CRUD(Create, Read, Update, Delete)
+ * 기능을 자동으로 제공받으며, 사용자 정의 쿼리 메소드를 추가할 수 있습니다.
+ */
+@Repository
+// 이 어노테이션은 Spring이 이 인터페이스를 컴포넌트 스캔 시 리포지토리로 인식하게 합니다.
+public interface RoleRepository extends JpaRepository<Role, Long> {
+    // JpaRepository<Role, Long>을 상속받음으로써 Role 엔티티에 대한 기본적인 JPA 기능을 사용할 수 있습니다.
+    // Role은 엔티티 타입, Long은 해당 엔티티의 ID(Primary Key) 타입입니다.
+
+    /**
+     * 권한 이름(name)을 기준으로 Role 엔티티를 조회합니다.
+     * Spring Data JPA의 쿼리 메소드 기능을 활용하여 메소드 이름만으로 쿼리를 자동 생성합니다.
+     * Role 엔티티의 'name' 필드가 'unique = true'로 설정되어 있으므로, 이 메소드는 최대 하나의 결과를 반환합니다.
+     *
+     * @param name 조회할 권한의 이름 (예: "USER", "ADMIN")
+     * @return 해당 이름을 가진 Role 객체. 만약 존재하지 않으면 null을 반환합니다.
+     */
+    public Role findByName(String name);
+}
+
+/*
+코드 해설
+RoleRepository 는 Spring Data JPA를 사용하여 Role 엔티티(애플리케이션의 권한 정보를 나타내는 객체)
+의 데이터를 다루는 데이터 접근 계층(Data Access Layer), 즉 리포지토리(Repository) 역할을 합니다
+
+org.springframework.data.jpa.repository.JpaRepository
+Spring Data JPA에서 제공하는 핵심 인터페이스 입니다
+이 인터페이스를 상속받음으로써 Role 엔티티에 대한
+save(), findById(), findAll(), delete() 등과 같은
+기본적인 CRUD(create, read, update, delete) 메소드들을 별도로 구현하지 않고도 사용할 수 있게 됩니다
+
+public Role findByName(String name)
+이것은 Spring Data JPA의 강력한 기능인 쿼리 메소드  입니다
+개발자 직접 SQL 쿼리를 작성할 필요없이, 메소드 이름을 규칙에 맞게 작성하면 Spring Data JPA가
+자동으로 해당 쿼리를 생성해 줍니다
+String name 은 쿼리 조건으로 사용될 권한 이름을 나타냅니다
+반환타입이 Role 인 이유는 Role 엔티티의 name 필드가
+@Column(unique = true) 로 설정되어 있기 때문에,
+name 으로 조회하면 결과는 최대 하나만 존재하기 때문입니다
+만약 해당 name을 가진 Role이 데이터베이스에 없다면 null을 반환합니다
+(만약 Optional<Role>로 선언했다면 null 대신 Optional.empty()를 반환하여
+NullPointerException 위험을 줄일 수 있습니다
+
+
+ */

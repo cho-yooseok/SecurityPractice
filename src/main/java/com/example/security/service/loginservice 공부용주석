@@ -1,0 +1,17 @@
+package com.example.security.service;
+
+
+import org.springframework.stereotype.Service;
+// 이 클래스를 서비스 컴포넌트로 지정하는 Spring 어노테이션입니다
+
+@Service
+// 이 어노테이션은 이 클래스가 Spring 프레임워크에서
+// "서비스"컴포넌트임을 나타냅니다
+public class LoginService {
+	// 현재 이 클래스는 비어 있습니다
+	// 로그인과 관련된  비즈니스 로직
+	// (예 : 로그인 성공/실패 처리. JWT 토큰 생성, 세션 관리 등)이
+	// 앞으로 이곳에 추가될 예정입니다
+
+
+}

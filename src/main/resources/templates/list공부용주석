@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<!-- HTML5 문서 선언, 언어는 영어로 설정. Thymeleaf와 Spring Security의 네임스페이스를 정의하여 관련 속성을 사용 가능 -->
+<head>
+    <title>Bootstrap Example</title>
+    <!-- 페이지 제목: 부트스트랩 예제 -->
+    <meta charset="utf-8">
+    <!-- 문자 인코딩: UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 반응형 웹 설정: 화면 크기에 맞게 조정, 초기 줌 레벨 1 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <!-- 부트스트랩 4.6.2 CSS 파일 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
+    <!-- jQuery Slim 3.7.1 로드 (부트스트랩 동작에 필요) -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <!-- Popper.js 1.16.1 로드 (부트스트랩의 드롭다운, 툴팁 등에 필요) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 부트스트랩 4.6.2 JavaScript 파일 로드 (jQuery와 Popper.js 포함) -->
+</head>
+<body>
+<div class="container mt-4">
+    <!-- 부트스트랩 컨테이너 클래스로 콘텐츠를 중앙 정렬, mt-4는 상단 마진 -->
+    <h2> 회원인증 시스템</h2>
+    <!-- 페이지 제목: 회원인증 시스템 -->
+    <div class="card">
+        <!-- 부트스트랩 카드 컴포넌트로 콘텐츠를 그룹화 -->
+        <div th:if="${not #authorization.expression('isAuthenticated()')}" class="card-header d-flex justify-content-center align-items-center">
+            <!-- Thymeleaf 조건문: 사용자가 인증되지 않은 경우에만 표시 -->
+            <!-- card-header: 카드의 헤더, d-flex: 플렉스박스, justify-content-center: 수평 중앙 정렬, align-items-center: 수직 중앙 정렬 -->
+            <form class="form-inline" th:action="@{/login}" method="post">
+                <!-- 로그인 폼: 인라인 폼 스타일, Thymeleaf로 /login 경로에 POST 요청 -->
+                <label for="username">Username:</label>
+                <!-- 사용자 이름 입력 필드 라벨 -->
+                <input type="text" class="form-control" placeholder="Enter username" id="username" name="username">
+                <!-- 사용자 이름 입력 필드, name="username"은 Spring Security에서 사용 -->
+                <label for="password">Password:</label>
+                <!-- 비밀번호 입력 필드 라벨 -->
+                <input type="password" class="form-control" placeholder="Enter password" id="password" name="password">
+                <!-- 비밀번호 입력 필드, name="password"는 Spring Security에서 사용 -->
+                <button type="submit" class="btn btn-primary btn-sm">로그인</button>
+                <!-- 로그인 버튼, 부트스트랩 스타일 적용 -->
+            </form>
+            <div class="mx-2">
+                <!-- 좌우 마진 2단위 -->
+                <a th:href="@{/register}" class="btn btn-sm btn-secondary">회원가입</a>
+                <!-- 회원가입 링크, Thymeleaf로 /register 경로 연결 -->
+            </div>
+        </div>
+        <div th:if="${#authorization.expression('isAuthenticated()')}" class="card-header d-flex justify-content-center align-items-center">
+            <!-- Thymeleaf 조건문: 사용자가 인증된 경우에만 표시 -->
+            <p class="mb-0">로그인 사용자: <span th:text="${#authentication.principal.member.name}" class="font-weight-bold"></span></p>
+            <!-- 인증된 사용자의 이름 표시, Thymeleaf로 principal.member.name 값을 동적으로 삽입 -->
+            <a th:href="@{/logout}" class="btn btn-danger btn-sm ml-2">로그아웃</a>
+            <!-- 로그아웃 링크, Thymeleaf로 /logout 경로 연결 -->
+            <ul class="list-unstyled mb-0 ml-2">
+                <!-- 권한 목록 표시, 스타일 없는 리스트 -->
+                <li th:each="role : ${#authentication.authorities}" th:text="${role.authority}" class="d-inline-block ml-2"></li>
+                <!-- Thymeleaf 반복문: 사용자의 권한(authorities)을 반복하여 표시 -->
+            </ul>
+            <div sec:authorize="hasAuthority('ROLE_ADMIN')">
+                <!-- Spring Security: ROLE_ADMIN 권한이 있는 사용자에게만 표시 -->
+                <a th:href="@{/member/admin}" class="btn btn-danger btn-sm">관리자 페이지</a>
+                <!-- 관리자 페이지 링크, Thymeleaf로 /member/admin 경로 연결 -->
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- 카드 본문 -->
+            <table class="table table-bordered">
+                <!-- 부트스트랩 테이블, 테두리 스타일 적용 -->
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>제목</th>
+                    <th>가격</th>
+                    <th>저자</th>
+                    <th>페이지</th>
+                    <!-- 테이블 헤더: 책 정보 항목 -->
+                </tr>
+                </thead>
+            </table>
+            <a th:if="${#authorization.expression('isAuthenticated()')}" th:href="@{/book/bookRegister}" class="btn btn-sm btn-primary">책 등록</a>
+            <!-- Thymeleaf 조건문: 인증된 사용자에게만 책 등록 버튼 표시, /book/bookRegister 경로 연결 -->
+        </div>
+        <div class="card-footer">스프링 부트(Spring Security)</div>
+        <!-- 카드 푸터: 스프링 부트와 Spring Security 사용 명시 -->
+    </div>
+</div>
+</body>
+</html>
+
+
+
+<!--
+1.
+xmlns:th 와 xmlns:sec 를 통한 Thymeleaf와 Spring Security 네임스페이스를 선언
+th:if 와 th:action 으로 동적 콘텐츠 렌더링 및 경로 설정
+sec:authorize로 권한 기반 콘텐츠 제어 (ROLE_ADMIN)
+${#authentication.principal.member.name} 으로 로그인한 사용자의 이름을 동적으로 표시
+
+2.
+부트 스트랩 사용
+Bootstrap 4.6.2 CSS와 JS 를 CDN 으로 로드하여 스타일과 동적 기능을 제공
+클래스(container,card,form-inline 등)을 활용해 반응형 레이아웃 구성
+
+3. 로그인/ 로그아웃 기능
+인증되지 않은 사용자는 로그인 폼과 회원가입링크를 확인
+인증된 사용자는 사용자 이름, 로그아웃 버튼, 권한 목록,
+관리자 페이지 링크(ROLE_ADMIN 소유자만)를 확인
+
+4. 테이블과 책 등록
+책 정보를 표시할 테이블 구조 제공(데이터는 동적으로 삽입될것으로 보임)
+인증된 사용자만 책 등록 링크를 볼 수 있음
+
+추가설명
+Tymeleaf 표현식
+${...}는 서버에서 데이터를 동적으로 삽입하며, #authentication 과
+#authorization 은 Spring Security와 통합된 객체로 사용자 인증 정보를 제공
+Spring Security
+isAuthenticated() 와 hasAuthority('ROLE_ADMIN') 는 인증 상태와 권한을 확인하는 데 사용
+
+부트 스트랩 컴포넌트 : 카드, 테이블, 버튼, 폼 등을 활용해 상용자 친화적인 UI 구성
+
+이 코드는 Spring Boot, Thymeleaf, Spring Security를 사용한 회원 인증 시스템의 프론트엔드 템플릿으로,
+ 인증 상태에 따라 다른 UI를 렌더링하고 관리자 권한에 따라 특정 기능(관리자 페이지)을 제한합니다.
+
+
+
+-->
